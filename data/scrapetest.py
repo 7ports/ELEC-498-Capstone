@@ -39,11 +39,11 @@ def log_error(e):
     """
     print(e)
 
-#raw_html = simple_get("https://weather.gc.ca/radar/index_e.html?id=XSM")
-raw_html = simple_get("http://explosm.net/comics/5036/")
+raw_html = simple_get("https://weather.gc.ca/radar/index_e.html?id=XSM")
+#raw_html = simple_get("http://explosm.net/comics/5036/")
 soup = BeautifulSoup(raw_html, 'lxml')
 for link in soup.find_all('img'):
-    image = "http://explosm.net/comics/5036" + link.get("src")
+    image = "https://weather.gc.ca/radar/index_e.html?id=XSM" + link.get("src")
     image_name = os.path.split(image)[1]
 
 
