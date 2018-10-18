@@ -10,6 +10,7 @@ def simple_get(url):
     If the content-type of response is some kind of HTML/XML, return the
     text content, otherwise return None.
     """
+	print("kieran was here")
     try:
         with closing(get(url, stream=True)) as resp:
             if is_good_response(resp):
