@@ -1,58 +1,38 @@
-from requests import get
-from requests.exceptions import RequestException
-from contextlib import closing
 from bs4 import BeautifulSoup
-import os
-
-def simple_get(url):
-    """
-    Attempts to get the content at `url` by making an HTTP GET request.
-    If the content-type of response is some kind of HTML/XML, return the
-    text content, otherwise return None.
-    """
-    try:
-        with closing(get(url, stream=True)) as resp:
-            if is_good_response(resp):
-                return resp.content
-            else:
-                return None
-
-    except RequestException as e:
-        log_error('Error during requests to {0} : {1}'.format(url, str(e)))
-        return None
+import requests
+import urllib
 
 
-def is_good_response(resp):
-    #Returns True if the response seems to be HTML, False otherwise.
-    
-    content_type = resp.headers['Content-Type'].lower()
-    return (resp.status_code == 200 
-            and content_type is not None 
-            and content_type.find('html') > -1)
+link = "https://weather.gc.ca/radar/index_e.html?id=XSM"
+link2 = 'https://uwaterloo.ca'
+source = requests.get(link2).text
 
 
-def log_error(e):
-    """
-    It is always a good idea to log errors. 
-    This function just prints them, but you can
-    make it do anything.
-    """
-    print(e)
+soup = BeautifulSoup(source, 'lxml')
 
-raw_html = simple_get("https://weather.gc.ca/radar/index_e.html?id=XSM")
-#raw_html = simple_get("http://explosm.net/comics/5036/")
-soup = BeautifulSoup(raw_html, 'lxml')
-for link in soup.find_all('img'):
-    image = "https://weather.gc.ca/radar/index_e.html?id=XSM" + link.get("src")
-    image_name = os.path.split(image)[1]
+#print(soup.prettify())
 
 
+#iterate over all image objects on webpage
+for img in soup.find_all('img'):
+    temp = img.get('src')
+    if temp[:1] == '/':
+        image = 'https://uwaterloo.ca' + temp
+    else:
+        image = temp
     print(image)
-    print(image_name)
-    if '?' in image_name:
-        image_name = image_name.split('?')[0]
-    r2 = get(image)
-    with open(image_name, "wb") as f:
-        f.write(r2.content)
 
-   
+    #check to see if alt tag is empty, if not make it filename otherwise give it a number
+    i = 1
+    nametemp = img.get('alt')
+    if len(nametemp) == 0:
+        filename = str(i)
+        i = i + 1
+    else:
+        filename = nametemp
+
+
+    #write the image file
+    imagefile = open(filename + '.gif', 'wb')
+    imagefile.write(urllib.request.urlopen(image).read())
+    imagefile.close()
