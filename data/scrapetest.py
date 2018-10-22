@@ -5,7 +5,7 @@ import urllib
 
 link = "https://weather.gc.ca/radar/index_e.html?id=XSM"
 link2 = 'https://uwaterloo.ca'
-source = requests.get(link2).text
+source = requests.get(link).text
 
 
 soup = BeautifulSoup(source, 'lxml')
@@ -14,10 +14,10 @@ soup = BeautifulSoup(source, 'lxml')
 
 
 #iterate over all image objects on webpage
-for img in soup.find_all('img'):
+for img in soup.find_all('img', id = 'animation-image'):
     temp = img.get('src')
     if temp[:1] == '/':
-        image = 'https://uwaterloo.ca' + temp
+        image = 'https://weather.gc.ca' + temp
     else:
         image = temp
     print(image)
@@ -33,6 +33,6 @@ for img in soup.find_all('img'):
 
 
     #write the image file
-    imagefile = open(filename + '.gif', 'wb')
+    imagefile = open(filename + 'GIF', 'wb')
     imagefile.write(urllib.request.urlopen(image).read())
     imagefile.close()
