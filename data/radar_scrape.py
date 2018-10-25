@@ -1,7 +1,6 @@
 from selenium import webdriver
 import time
-from scrapetest import getgif
-import urllib
+import urllib.request
 import os
 
 driver = webdriver.Chrome("C:/Users/rajes/OneDrive/Documents/ELEC498/ELEC-498-Capstone/data/drivers/chromedriver.exe")
