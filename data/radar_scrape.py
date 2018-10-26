@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.common.exceptions import WebDriverException
 import time
 import urllib.request
 import os
@@ -6,6 +7,7 @@ import os
 driver = webdriver.Chrome("C:/Users/rajes/OneDrive/Documents/ELEC498/ELEC-498-Capstone/data/drivers/chromedriver.exe")
 #no images flag
 flag = 0
+sitename = 'Victoria'
 
 driver.set_page_load_timeout(10)
 driver.get('http://climate.weather.gc.ca/radar/index_e.html')
@@ -49,20 +51,26 @@ for j in range(3,5):
             #click the submit button
             driver.find_element_by_id("Submit2").click()
 
-
+            sc = 0
             #iterate over hours
             for i in range(0,12):
+                #click through the photos in the animation to increment by hours (only on the second iteration of the loop onwards)
+                if sc == 1:
+                    try:   
+                        driver.find_element_by_id("nextimage").click()
+                    except WebDriverException:
+                        break
                 #get the source element of the image object
                 img = driver.find_element_by_xpath("//img[@id = 'radar']")
                 src = img.get_attribute('src')
                 print(src)
                 #open a file with the name information from the form
-                imagefile = open(site + '-' + year + '-' + day + '-' + month + '%' + str(i) + '.gif', 'wb')
+                imagefile = open(sitename + '-' + year + '-' + day + '-' + month + '-' + str(i) + '.gif', 'wb')
                 #write the image value to the file
                 imagefile.write(urllib.request.urlopen(src).read())
                 imagefile.close()
-                #click through the photos in the animation to increment by hours
-                driver.find_element_by_id("nextimage").click()
+                sc = 1
+                
             
             #go back to do the last hours of the day
             driver.back()
@@ -95,19 +103,24 @@ for j in range(3,5):
             #click the submit button
             driver.find_element_by_id("Submit2").click()
 
-
+            sc = 0
             for i in range(13,24):
+                #click through the photos in the animation to increment by hours (only from the second iteration of the loop onwards)
+                if sc == 1:
+                    try:   
+                        driver.find_element_by_id("nextimage").click()
+                    except WebDriverException:
+                        break
                 #get the source element of the image object
                 img = driver.find_element_by_xpath("//img[@id = 'radar']")
                 src = img.get_attribute('src')
                 print(src)
                 #open a file with the name information from the form
-                imagefile = open(site + '-' + year + '-' + day + '-' + month + '%' + str(i) + '.gif', 'wb')
+                imagefile = open(sitename + '-' + year + '-' + day + '-' + month + '-' + str(i) + '.gif', 'wb')
                 #write the image value to the file
                 imagefile.write(urllib.request.urlopen(src).read())
                 imagefile.close()
-                #click through the photos in the animation to increment by hours
-                driver.find_element_by_id("nextimage").click()
+                sc = 1
             #go back to reset the form page
             driver.back()
         if flag == 1:
