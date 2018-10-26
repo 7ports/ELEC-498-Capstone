@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
 
+
+echo "-----------------------SORTING IMAGES------------------------"
+echo "."
 for entry in ./$1/*.gif; # cycle through all *.gif (images) entries in directory
 do
 	FILE=$(basename $entry) # takes file name only from path
@@ -15,16 +18,33 @@ do
 	# INFO[4] = Image No.
 	#-------------------------------------------------------------
 
-	if [ ! -d ./${INFO[0]}/${INFO[1]}/${INFO[3]}/${INFO[2]}/ ]
-	then
-		echo "the folder doesnt exist"
-		echo "./${INFO[0]}/${INFO[1]}/${INFO[3]}/${INFO[2]}/ "
-	fi
+	# Constructing File Path in variable FPATH
+	FPATH="./${INFO[0]}/${INFO[1]}/${INFO[3]}/${INFO[2]}/ "
+	echo $FPATH
 
-	echo "----------------------------"
-	echo "MOVING FILE:" 
-	echo $FILE
+	# Check if the directory for the file has been created
+	if [ ! -d $FPATH ]   
+	then
+		# If directory cannot be found, create the folder and
+		# all other parent directories required. 
+		echo "The folder: $FPATH"
+		echo "could not be found... Creating directory"
+		mkdir -p $FPATH
+	fi
 	
+	# Move the files to the specified directory they belong to
+	echo "------------------------------------------------------------"
+	echo "."
+	echo "MOVING FILE:  $FILE"
+	echo "."
+	mv $FILE $FPATH
 done
 
-echo "exit Loop"
+echo "----------------------PROCESS COMPLETE----------------------"
+echo "."
+echo "DISPLAYING CONTENTS OF FOLDER: $FPATH"
+echo "------------------------------------------------------------"
+echo "."
+ls $FPATH
+echo "."
+echo "------------------------------------------------------------"
