@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 
-
+IPATH="$1"
 echo "-----------------------SORTING IMAGES------------------------"
 echo "."
-for entry in ./$1/*.gif; # cycle through all *.gif (images) entries in directory
+for entry in $IPATH/*.gif; # cycle through all *.gif (images) entries in directory
 do
 	FILE=$(basename $entry) # takes file name only from path
 	INFO=(${FILE//-/ })
@@ -37,7 +37,7 @@ do
 	echo "."
 	echo "MOVING FILE:  $FILE"
 	echo "."
-	mv $FILE $FPATH
+	mv $IPATH/$FILE $FPATH
 done
 
 echo "----------------------PROCESS COMPLETE----------------------"
