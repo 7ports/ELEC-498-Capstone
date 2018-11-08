@@ -4,7 +4,7 @@ import time
 import urllib.request
 import os
 
-driver = webdriver.Chrome("C:/Users/rajes/OneDrive/Documents/ELEC498/ELEC-498-Capstone/data/drivers/chromedriver.exe")
+driver = webdriver.Chrome("C:/Users/rajes/OneDrive/Documents/ELEC498 numba 2/ELEC-498-Capstone/data/drivers/chromedriver.exe")
 #no images flag
 flag = 0
 sitename = 'Victoria'
@@ -65,7 +65,7 @@ for j in range(3,5):
                 src = img.get_attribute('src')
                 print(src)
                 #open a file with the name information from the form
-                imagefile = open(sitename + '-' + year + '-' + day + '-' + month + '-' + str(i) + '.gif', 'wb')
+                imagefile = open(sitename + '-' + year + '-' + day + '-' + month + '-' + str(i) + '.jpg', 'wb')
                 #write the image value to the file
                 imagefile.write(urllib.request.urlopen(src).read())
                 imagefile.close()
@@ -116,7 +116,7 @@ for j in range(3,5):
                 src = img.get_attribute('src')
                 print(src)
                 #open a file with the name information from the form
-                imagefile = open(sitename + '-' + year + '-' + day + '-' + month + '-' + str(i) + '.gif', 'wb')
+                imagefile = open(sitename + '-' + year + '-' + day + '-' + month + '-' + str(i) + '.jpg', 'wb')
                 #write the image value to the file
                 imagefile.write(urllib.request.urlopen(src).read())
                 imagefile.close()
