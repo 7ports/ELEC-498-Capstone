@@ -1,3 +1,9 @@
 #!/usr/bin/env bash
 
-python cropIm.py ./tmp/hollyrood.png 
+path=$1
+
+for i in $path*.png;
+do
+	file=$(basename $i)
+	python cropIm.py $path$file 
+done
