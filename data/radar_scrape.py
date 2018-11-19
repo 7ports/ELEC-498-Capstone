@@ -12,7 +12,7 @@ sitename = 'Victoria'
 driver.set_page_load_timeout(10)
 driver.get('http://climate.weather.gc.ca/radar/index_e.html')
 #iterate over years
-for j in range(3,5):
+for j in range(1,5):
     #Select the correct year for the iteration
     driver.find_element_by_xpath('//select[@name="year"]/option['+ str(j) + ']').click()
     year = driver.find_element_by_xpath('//select[@name="year"]/option['+ str(j) + ']').text
@@ -31,7 +31,10 @@ for j in range(3,5):
             driver.find_element_by_xpath('//select[@name="site"]/optgroup[2]/option[4]').click()
             site = driver.find_element_by_xpath('//select[@name="site"]/optgroup[2]/option[4]').text
             #select the correct day for the iteration
-            driver.find_element_by_xpath('//select[@name="day"]/option[' + str(x) +']').click()
+            try:
+                driver.find_element_by_xpath('//select[@name="day"]/option[' + str(x) +']').click()
+            except WebDriverException:
+                continue
             day = driver.find_element_by_xpath('//select[@name="day"]/option[' + str(x) +']').text
             #select the 12 hour duration pictures
             driver.find_element_by_xpath('//select[@name = "duration"]/option[3]').click()
@@ -41,6 +44,7 @@ for j in range(3,5):
             #split the list up
             options = options.split('\n')
             #check each option in the list to see if it is Rain 14 colours and make note of the option location
+            best = 1
             for t in range(len(options)):
                 if options[t] == "No images available":
                     flag = 1
@@ -61,7 +65,10 @@ for j in range(3,5):
                     except WebDriverException:
                         break
                 #get the source element of the image object
-                img = driver.find_element_by_xpath("//img[@id = 'radar']")
+                try:
+                    img = driver.find_element_by_xpath("//img[@id = 'radar']")
+                except WebDriverException:
+                    break
                 src = img.get_attribute('src')
                 print(src)
                 #open a file with the name information from the form
@@ -112,7 +119,10 @@ for j in range(3,5):
                     except WebDriverException:
                         break
                 #get the source element of the image object
-                img = driver.find_element_by_xpath("//img[@id = 'radar']")
+                try:
+                    img = driver.find_element_by_xpath("//img[@id = 'radar']")
+                except WebDriverException:
+                    break
                 src = img.get_attribute('src')
                 print(src)
                 #open a file with the name information from the form
