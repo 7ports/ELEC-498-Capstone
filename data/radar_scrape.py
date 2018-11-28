@@ -7,7 +7,7 @@ import os
 driver = webdriver.Chrome("C:/Users/rajes/OneDrive/Documents/ELEC498 numba 2/ELEC-498-Capstone/data/drivers/chromedriver.exe")
 #no images flag
 flag = 0
-sitename = 'Victoria'
+sitename = 'Halifax'
 
 driver.set_page_load_timeout(10)
 driver.get('http://climate.weather.gc.ca/radar/index_e.html')
@@ -28,8 +28,8 @@ for j in range(2,3):
             driver.find_element_by_xpath('//select[@name="hour"]/option[1]').click()
             driver.find_element_by_xpath('//select[@name="minute"]/option[1]').click()
             #Select the same site for each iteration
-            driver.find_element_by_xpath('//select[@name="site"]/optgroup[2]/option[4]').click()
-            site = driver.find_element_by_xpath('//select[@name="site"]/optgroup[2]/option[4]').text
+            driver.find_element_by_xpath('//select[@name="site"]/optgroup[2]/option[28]').click()
+            site = driver.find_element_by_xpath('//select[@name="site"]/optgroup[2]/option[28]').text
             #select the correct day for the iteration
             try:
                 driver.find_element_by_xpath('//select[@name="day"]/option[' + str(x) +']').click()
@@ -62,7 +62,7 @@ for j in range(2,3):
                 continue
             sc = 0
             #iterate over hours
-            for i in range(0,12):
+            for i in range(0,13):
                 #click through the photos in the animation to increment by hours (only on the second iteration of the loop onwards)
                 if sc == 1:
                     try:   
@@ -93,8 +93,8 @@ for j in range(2,3):
             driver.find_element_by_xpath('//select[@name="hour"]/option[14]').click()
             driver.find_element_by_xpath('//select[@name="minute"]/option[1]').click()
             #Select the same site for each iteration
-            driver.find_element_by_xpath('//select[@name="site"]/optgroup[2]/option[4]').click()
-            site = driver.find_element_by_xpath('//select[@name="site"]/optgroup[2]/option[4]').text
+            driver.find_element_by_xpath('//select[@name="site"]/optgroup[2]/option[28]').click()
+            site = driver.find_element_by_xpath('//select[@name="site"]/optgroup[2]/option[28]').text
             #select the correct day for the iteration
             driver.find_element_by_xpath('//select[@name="day"]/option[' + str(x) + ']').click()
             day = driver.find_element_by_xpath('//select[@name="day"]/option[' + str(x) + ']').text
