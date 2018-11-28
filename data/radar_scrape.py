@@ -12,7 +12,7 @@ sitename = 'Victoria'
 driver.set_page_load_timeout(10)
 driver.get('http://climate.weather.gc.ca/radar/index_e.html')
 #iterate over years
-for j in range(1,5):
+for j in range(2,3):
     #Select the correct year for the iteration
     driver.find_element_by_xpath('//select[@name="year"]/option['+ str(j) + ']').click()
     year = driver.find_element_by_xpath('//select[@name="year"]/option['+ str(j) + ']').text
@@ -21,9 +21,9 @@ for j in range(1,5):
         #Select the correct month for the iteration
         driver.find_element_by_xpath('//select[@name="month"]/option[' + str(z) +']').click()
         month = driver.find_element_by_xpath('//select[@name="month"]/option[' + str(z) +']').text
-        numdays = len(driver.find_element_by_xpath('//select[@name="day"]').text.split('\n'))
+        #numdays = len(driver.find_element_by_xpath('//select[@name="day"]').text.split('\n'))
         #iterate over days
-        for x in range(1,numdays):
+        for x in range(1,31):
             #Select the same starting hour for each iteration (always 00:00)
             driver.find_element_by_xpath('//select[@name="hour"]/option[1]').click()
             driver.find_element_by_xpath('//select[@name="minute"]/option[1]').click()
@@ -51,10 +51,15 @@ for j in range(1,5):
                     break
                 if '14' in options[t] and 'Rain' in options[t]:
                     best = t + 1
-            driver.find_element_by_xpath('//select[@name ="image_type"]/option[' + str(best) + ']').click()
+            try:
+                driver.find_element_by_xpath('//select[@name ="image_type"]/option[' + str(best) + ']').click()
+            except WebDriverException:
+                continue
             #click the submit button
-            driver.find_element_by_id("Submit2").click()
-
+            try:
+                driver.find_element_by_id("Submit2").click()
+            except WebDriverException:
+                continue
             sc = 0
             #iterate over hours
             for i in range(0,12):
@@ -106,10 +111,15 @@ for j in range(1,5):
                     break
                 if '14' in options[t] and 'Rain' in options[t]:
                     best = t + 1
-            driver.find_element_by_xpath('//select[@name ="image_type"]/option[' + str(best) + ']').click()
+            try:
+                driver.find_element_by_xpath('//select[@name ="image_type"]/option[' + str(best) + ']').click()
+            except WebDriverException:
+                continue
             #click the submit button
-            driver.find_element_by_id("Submit2").click()
-
+            try:
+                driver.find_element_by_id("Submit2").click()
+            except WebDriverException:
+                continue
             sc = 0
             for i in range(13,24):
                 #click through the photos in the animation to increment by hours (only from the second iteration of the loop onwards)
@@ -133,8 +143,5 @@ for j in range(1,5):
                 sc = 1
             #go back to reset the form page
             driver.back()
-        if flag == 1:
-            flag = 0
-            break
 time.sleep(10)
 driver.quit()
