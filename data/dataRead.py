@@ -52,7 +52,7 @@ with open ('Master_numpy_withnoNulls_FIXED.csv', 'r') as csvfile:
 
 
 
-
+#this comment is here just cause
 
 #initialize data in correct shape
 temp = np.zeros((24,31,31,3))
