@@ -7,7 +7,7 @@ from numpy import array, hstack, vstack
 
 
 
-os.chdir('C:/Users/rajes/OneDrive/Documents/ELEC498numba2/ELEC-498-Capstone/data')
+os.chdir('C:/Users/rajes/OneDrive/Documents/ELEC498renew/ELEC-498-Capstone/data')
 
 #set up all values so they can be altered easily
 year = 2008
@@ -84,7 +84,7 @@ for year in range(2008, 2017):
                     for i in range(31):
                         #attempt to extract row of the image for the current hour
                         try:
-                            temprow = list(f[str(year)][months[currmonth]][str(day)][str(hour)][filename][i])
+                            temprow = list(f[str(year)][months[currmonth]][str(day)][str(hour) + '-' + str(compass)][filename][i])
                         except:
                             #if the hour cannot be found then break
                             print("hour " + str(hour) + " for " + filename +  " not found, skipping")
