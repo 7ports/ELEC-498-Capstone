@@ -5,7 +5,7 @@ from keras import optimizers, initializers
 import h5py
 import numpy as np
 from time import time
-from keras.callbacks import TensorBoard
+from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
 import os
 import csv
 import seaborn as sns
@@ -55,26 +55,38 @@ train_x, test_x = b[:train_amount,:], b[train_amount:, :]
 train_y, test_y = g[:train_amount,:], g[train_amount:, :]
 
 
-#the following is for testing a singular model
+#the following is for testing a singular model, change the parameters below to determine the characteristics of the model
 convlayer = 2
 denselayer = 4
 layersizes = 2048
 kernelsize = 3
 numepochs = 30
 activationfuncs = 'elu'
-#construct name
-
-
-
-
+#whether or not to use tensorboard
+tbon = False
+#whether or not to save the model in an hdf5 file
+savemodel = False
+earlystop = False
+#the list of callbacks to be used when fitting the model
+cbs = []
+if tbon:
+    #construct name
+    NAME = "{}-conv-{}-nodes-{}-dense-{}-kernelsize-{}-activation-{}".format(convlayer, layersizes, denselayer, kernelsize, activationfuncs, int(time()))
+    #instantiate tensorboard
+    tb = TensorBoard(log_dir="C:\\Users\\rajes\\OneDrive\\Documents\\ELEC498numba2\\ELEC-498-Capstone\\data\\logs/{}".format(NAME))
+    print(NAME)
+    cbs.append(tb)
+if savemodel:
+    mc = ModelCheckpoint(NAME + ".hdf5", monitor  = "val_acc", verbose = 0, save_best_only = True, save_weights_only = False, mode = 'max', period = 1)
+    cbs.append(mc)
+if earlystop:
+    es = EarlyStopping(monitor = 'val_acc', min_delta = '0.05', patience = '5', verbose = 0, mode = 'max', baseline = None, restore_best_weights = True)
+    cbs.append(es)
 #begin model construction
 model = Sequential()
 
 
-#NAME = "{}-conv-{}-nodes-{}-dense-{}-kernelsize-{}-activation-{}".format(convlayer, layersize, denselayer, kernelsize, funcs, int(time()))
-#instantiate tensorboard
-#tb = TensorBoard(log_dir="C:\\Users\\rajes\\OneDrive\\Documents\\ELEC498numba2\\ELEC-498-Capstone\\data\\logs/{}".format(NAME))
-#print(NAME)   
+
 
 
 
@@ -97,8 +109,10 @@ model.add(Dense(units = 3, activation = 'softmax', bias_initializer = 'glorot_un
 sgd = optimizers.SGD(lr = 0.01, clipnorm = 1)
 model.compile(optimizer = sgd, loss = 'categorical_crossentropy', metrics = ['accuracy'])
 
-#fit model
-model.fit(train_x, train_y, validation_data = (test_x, test_y), epochs = numepochs)
+
+#fit model with appropriate callbacks
+model.fit(train_x, train_y, validation_data = (test_x, test_y), epochs = numepochs, callbacks=cbs)
+
   
 
 
