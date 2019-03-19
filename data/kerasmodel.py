@@ -66,7 +66,10 @@ activationfuncs = 'elu'
 tbon = False
 #whether or not to save the model in an hdf5 file
 savemodel = False
+#whehter or not to stop early if stagnated
 earlystop = False
+#whether or not to reduce learning rate after plateauing
+plateau = False
 #the list of callbacks to be used when fitting the model
 cbs = []
 if tbon:
@@ -75,13 +78,20 @@ if tbon:
     #instantiate tensorboard
     tb = TensorBoard(log_dir="C:\\Users\\rajes\\OneDrive\\Documents\\ELEC498numba2\\ELEC-498-Capstone\\data\\logs/{}".format(NAME))
     print(NAME)
+    #add to list of callbacks
     cbs.append(tb)
 if savemodel:
     mc = ModelCheckpoint(NAME + ".hdf5", monitor  = "val_acc", verbose = 0, save_best_only = True, save_weights_only = False, mode = 'max', period = 1)
+    #add to list of callbacks
     cbs.append(mc)
 if earlystop:
-    es = EarlyStopping(monitor = 'val_acc', min_delta = '0.05', patience = '5', verbose = 0, mode = 'max', baseline = None, restore_best_weights = True)
+    es = EarlyStopping(monitor = 'val_acc', min_delta = '0.05', patience = '10', verbose = 0, mode = 'max', baseline = None, restore_best_weights = True)
+    #add to list of callbacks
     cbs.append(es)
+if plateau:
+    rp = ReduceLROnPlateau(monitor = 'val_acc', factor = 0.1, patience = 5, verbose = 0, mode = 'max', min_delta = 0.05, cooldown = 2, min_lr = 0.01)
+    #add to list of callbacks
+    cbs.append(rp)
 #begin model construction
 model = Sequential()
 
