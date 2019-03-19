@@ -89,7 +89,7 @@ model.add(Flatten())
 for i in range(denselayer):
     model.add(Dense(units = layersizes, activation = 'elu', bias_initializer = 'glorot_uniform'))
     model.add(BatchNormalization())
-    model.add(Dropout(0.1))
+    model.add(Dropout(0.2))
 #add output layer
 model.add(Dense(units = 3, activation = 'softmax', bias_initializer = 'glorot_uniform'))
 #compile model
