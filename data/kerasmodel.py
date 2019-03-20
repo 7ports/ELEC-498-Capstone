@@ -1,4 +1,4 @@
-from keras.utils import to_categorical, plot_model
+from keras.utils import to_categorical
 from keras.models import Sequential
 from keras.layers import Dense, Flatten, Dropout, Conv3D, MaxPooling3D, Input, BatchNormalization, AveragePooling3D
 from keras import optimizers, initializers
@@ -10,6 +10,7 @@ import os
 import csv
 import seaborn as sns
 import matplotlib.pyplot as plt
+import pickle
 
 #setting current directories and paths since conda envs interact weird
 #specifically add graphviz to path for use with generating model pngs
@@ -26,6 +27,9 @@ c = h5f['dataset_y'][:]
 
 #convert labels into a one-hot encoded format
 g = to_categorical(c)
+
+#uncomment the following if you want to see data plotted before each time you run
+"""
 labels = [0,0,0]
 for things in g:
     if np.array_equal(things,[1,0,0]):
@@ -34,10 +38,10 @@ for things in g:
         labels[1] += 1
     elif np.array_equal(things,[0,0,1]):
         labels[2] += 1
-
+#plot categorized data
 sns.barplot(x = [0,1,2], y = labels)
 plt.show()
-
+"""
 
 #shuffle the data in unison to get a random test and training set
 rng_state = np.random.get_state()
@@ -55,75 +59,107 @@ train_x, test_x = b[:train_amount,:], b[train_amount:, :]
 train_y, test_y = g[:train_amount,:], g[train_amount:, :]
 
 
+
+##############################################################################################################################
 #the following is for testing a singular model, change the parameters below to determine the characteristics of the model
-convlayer = 2
-denselayer = 4
-layersizes = 2048
-kernelsize = 3
-numepochs = 30
-activationfuncs = 'elu'
+
+#number of convolution layers in each run
+convlayers = [2]
+denselayers =[4]
+layersizes = [2048]
+kernelsizes = [3]
+numepochs = 10
+dropoutrates = [0.2]
+activationfunc = 'elu'
+learningrates = [0.01]
 #whether or not to use tensorboard
 tbon = False
-#whether or not to save the model in an hdf5 file
+#whether or not to simply save final model in an h5 file
+simplesavemodel = True
+#whether or not to use modelcheckpoint to save model
 savemodel = False
 #whehter or not to stop early if stagnated
 earlystop = False
 #whether or not to reduce learning rate after plateauing
-plateau = False
-#the list of callbacks to be used when fitting the model
-cbs = []
-if tbon:
-    #construct name
-    NAME = "{}-conv-{}-nodes-{}-dense-{}-kernelsize-{}-activation-{}".format(convlayer, layersizes, denselayer, kernelsize, activationfuncs, int(time()))
-    #instantiate tensorboard
-    tb = TensorBoard(log_dir="C:\\Users\\rajes\\OneDrive\\Documents\\ELEC498numba2\\ELEC-498-Capstone\\data\\logs/{}".format(NAME))
-    print(NAME)
-    #add to list of callbacks
-    cbs.append(tb)
-if savemodel:
-    mc = ModelCheckpoint(NAME + ".hdf5", monitor  = "val_acc", verbose = 0, save_best_only = True, save_weights_only = False, mode = 'max', period = 1)
-    #add to list of callbacks
-    cbs.append(mc)
-if earlystop:
-    es = EarlyStopping(monitor = 'val_acc', min_delta = '0.05', patience = '10', verbose = 0, mode = 'max', baseline = None, restore_best_weights = True)
-    #add to list of callbacks
-    cbs.append(es)
-if plateau:
-    rp = ReduceLROnPlateau(monitor = 'val_acc', factor = 0.1, patience = 5, verbose = 0, mode = 'max', min_delta = 0.05, cooldown = 2, min_lr = 0.01)
-    #add to list of callbacks
-    cbs.append(rp)
-#begin model construction
-model = Sequential()
+plateau = True
+#whether or not to save history of the training in a pickle file
+savehistory = True
+
+
+#end of parameterization
+##############################################################################################################################
+
+##############################################################################################################################
+#begin iterating over different sets of parameters, creating new sets of callbacks, new name, and new keras model each time, and saving each attempt into files
+for convlayer in convlayers:
+    for denselayer in denselayers:
+        for layersize in layersizes:
+            for kernelsize in kernelsizes:
+                for dropoutrate in dropoutrates:
+                    for learningrate in learningrates:
+                        #construct name
+                        NAME = "{}-conv-{}-nodes-{}-dense-{}-kernelsize-{}-activation-{}".format(convlayer, layersize, denselayer, kernelsize, activationfunc, int(time()))
+                        #the list of callbacks to be used when fitting the model
+                        cbs = []
+                        if tbon:
+                            #instantiate tensorboard
+                            tb = TensorBoard(log_dir="C:\\Users\\rajes\\OneDrive\\Documents\\ELEC498numba2\\ELEC-498-Capstone\\data\\logs/{}".format(NAME))
+                            print(NAME)
+                            #add to list of callbacks
+                            cbs.append(tb)
+                        if savemodel:
+                            mc = ModelCheckpoint(NAME + ".hdf5", monitor  = "val_acc", verbose = 0, save_best_only = True, save_weights_only = False, mode = 'max', period = 1)
+                            #add to list of callbacks
+                            cbs.append(mc)
+                        if earlystop:
+                            es = EarlyStopping(monitor = 'val_acc', min_delta = '0.05', patience = '10', verbose = 0, mode = 'max', baseline = None)
+                            #add to list of callbacks
+                            cbs.append(es)
+                        if plateau:
+                            rp = ReduceLROnPlateau(monitor = 'val_acc', factor = 0.1, patience = 5, verbose = 0, mode = 'max', min_delta = 0.05, cooldown = 2, min_lr = 0.0000001)
+                            #add to list of callbacks
+                            cbs.append(rp)
+
+                        #begin model construction
+                        model = Sequential()
+                        #add convolution and pooling layers
+                        for i in range(convlayer):
+                            model.add(Conv3D(filters = 32, kernel_size = (1,kernelsize,kernelsize), strides = (1,1,1), activation  = 'relu', bias_initializer = 'glorot_uniform', input_shape = (24,31,31,3)))
+                            model.add(MaxPooling3D(pool_size = (2,2,2)))
+                        #add flatten layer
+                        model.add(Flatten())
+                        #add dense layers
+                        #bias = initializers.RandomNormal(mean = 0.5, stddev = 0.05, seed = None)
+                        for i in range(denselayer):
+                            model.add(Dense(units = layersize, activation = activationfunc, bias_initializer = 'glorot_uniform'))
+                            model.add(BatchNormalization())
+                            model.add(Dropout(dropoutrate))
+                        #add output layer
+                        model.add(Dense(units = 3, activation = 'softmax', bias_initializer = 'glorot_uniform'))
+                        #compile model
+                        #create SGD optimizer
+                        sgd = optimizers.SGD(lr = learningrate, clipnorm = 1)
+                        model.compile(optimizer = sgd, loss = 'categorical_crossentropy', metrics = ['accuracy'])
+
+
+                        #fit model with appropriate callbacks
+                        history = model.fit(train_x, train_y, validation_data = (test_x, test_y), epochs = numepochs, callbacks=cbs)
 
 
 
+                        os.chdir('C:/Users/rajes/OneDrive/Documents/ELEC498renew/ELEC-498-Capstone/data/models')
+                        os.mkdir('C:/Users/rajes/OneDrive/Documents/ELEC498renew/ELEC-498-Capstone/data/models/' + NAME)
+                        os.chdir('C:/Users/rajes/OneDrive/Documents/ELEC498renew/ELEC-498-Capstone/data/models/' + NAME)
+                        #save the model
+                        if simplesavemodel:
+                            model.save(NAME + ".h5")
+                        #save the training history endcoded as pickle file
+                        if savehistory:
+                            with open(NAME, 'wb') as histfile:
+                                pickle.dump(history.history, histfile)
 
-
-
-#add convolution and pooling layers
-for i in range(convlayer):
-    model.add(Conv3D(filters = 32, kernel_size = (1,kernelsize,kernelsize), strides = (1,1,1), activation  = 'relu', bias_initializer = 'glorot_uniform', input_shape = (24,31,31,3)))
-    model.add(MaxPooling3D(pool_size = (2,2,2)))
-#add flatten layer
-model.add(Flatten())
-#add dense layers
-#bias = initializers.RandomNormal(mean = 0.5, stddev = 0.05, seed = None)
-for i in range(denselayer):
-    model.add(Dense(units = layersizes, activation = 'elu', bias_initializer = 'glorot_uniform'))
-    model.add(BatchNormalization())
-    model.add(Dropout(0.2))
-#add output layer
-model.add(Dense(units = 3, activation = 'softmax', bias_initializer = 'glorot_uniform'))
-#compile model
-#create SGD optimizer
-sgd = optimizers.SGD(lr = 0.01, clipnorm = 1)
-model.compile(optimizer = sgd, loss = 'categorical_crossentropy', metrics = ['accuracy'])
-
-
-#fit model with appropriate callbacks
-model.fit(train_x, train_y, validation_data = (test_x, test_y), epochs = numepochs, callbacks=cbs)
-
-  
+#end of iteration                                
+##############################################################################################################################
 
 
                     
