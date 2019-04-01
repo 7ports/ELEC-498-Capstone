@@ -4,12 +4,12 @@ import time
 import urllib.request
 import os
 
-driver = webdriver.Chrome("C:/Users/rajes/OneDrive/Documents/ELEC498 numba 2/ELEC-498-Capstone/data/drivers/chromedriver.exe")
+driver = webdriver.Chrome("C:/Users/rajes/OneDrive/Documents/ELEC498renew/ELEC-498-Capstone/data/drivers/chromedriver.exe")
 #no images flag
 flag = 0
 sitename = 'Halifax'
 
-driver.set_page_load_timeout(10)
+driver.set_page_load_timeout(60)
 driver.get('http://climate.weather.gc.ca/radar/index_e.html')
 #iterate over years
 for j in range(2,3):
@@ -28,8 +28,8 @@ for j in range(2,3):
             driver.find_element_by_xpath('//select[@name="hour"]/option[1]').click()
             driver.find_element_by_xpath('//select[@name="minute"]/option[1]').click()
             #Select the same site for each iteration
-            driver.find_element_by_xpath('//select[@name="site"]/optgroup[2]/option[28]').click()
-            site = driver.find_element_by_xpath('//select[@name="site"]/optgroup[2]/option[28]').text
+            driver.find_element_by_xpath('//select[@name="site"]/optgroup[2]/option[29]').click()
+            site = driver.find_element_by_xpath('//select[@name="site"]/optgroup[2]/option[29]').text
             #select the correct day for the iteration
             try:
                 driver.find_element_by_xpath('//select[@name="day"]/option[' + str(x) +']').click()
@@ -93,7 +93,7 @@ for j in range(2,3):
             driver.find_element_by_xpath('//select[@name="hour"]/option[14]').click()
             driver.find_element_by_xpath('//select[@name="minute"]/option[1]').click()
             #Select the same site for each iteration
-            driver.find_element_by_xpath('//select[@name="site"]/optgroup[2]/option[28]').click()
+            driver.find_element_by_xpath('//select[@name="site"]/optgroup[2]/option[29]').click()
             site = driver.find_element_by_xpath('//select[@name="site"]/optgroup[2]/option[28]').text
             #select the correct day for the iteration
             driver.find_element_by_xpath('//select[@name="day"]/option[' + str(x) + ']').click()

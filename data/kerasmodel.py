@@ -1,7 +1,7 @@
 from keras.utils import to_categorical
 from keras.models import Sequential
 from keras.layers import Dense, Flatten, Dropout, Conv3D, MaxPooling3D, BatchNormalization
-from keras import optimizers
+from keras import optimizers, backend
 import h5py
 import numpy as np
 from time import time
@@ -10,6 +10,11 @@ import os
 import seaborn as sns
 import matplotlib.pyplot as plt
 import pickle
+import gc
+import tensorflow as tf
+
+#enable the garbage collector
+gc.enable()
 
 #setting current directories and paths since conda envs interact weird
 #specifically add graphviz to path for use with generating model pngs
@@ -28,7 +33,7 @@ c = h5f['dataset_y'][:]
 g = to_categorical(c)
 
 #uncomment the following if you want to see data plotted before each time you run
-"""
+
 labels = [0,0,0]
 for things in g:
     if np.array_equal(things,[1,0,0]):
@@ -39,8 +44,11 @@ for things in g:
         labels[2] += 1
 #plot categorized data
 sns.barplot(x = [0,1,2], y = labels)
+plt.xlabel("Class Labels", fontsize = 20)
+plt.ylabel("Number of Samples", fontsize = 20)
+plt.title("Data Distributions", fontsize = 25)
 plt.show()
-"""
+
 
 #shuffle the data in unison to get a random test and training set
 rng_state = np.random.get_state()
@@ -63,13 +71,13 @@ train_y, test_y = g[:train_amount,:], g[train_amount:, :]
 #the following is for testing a singular model, change the parameters below to determine the characteristics of the model
 
 #number of convolution layers in each run
-convlayers = [2, 1, 3]
-denselayers =[3, 4, 2]
-layersizes = [2048, 1024]
-kernelsizes = [3, 4, 2]
+convlayers = [2]
+denselayers =[3]
+layersizes = [2048]
+kernelsizes = [3]
 numepochs = 40
-dropoutrates = [0.2, 0.1, 0.5]
-activationfuncs = ['sigmoid', 'elu', 'tanh']
+dropoutrates = [0.1]
+activationfuncs = ['elu']
 learningrates = [0.01]
 #whether or not to simply save final model in an h5 file
 simplesavemodel = True
@@ -83,7 +91,6 @@ savehistory = True
 
 #end of parameterization
 ##############################################################################################################################
-
 ##############################################################################################################################
 #begin iterating over different sets of parameters, creating new sets of callbacks, new name, and new keras model each time, and saving each attempt into files
 for convlayer in convlayers:
@@ -93,8 +100,9 @@ for convlayer in convlayers:
                 for dropoutrate in dropoutrates:
                     for learningrate in learningrates:
                         for activationfunc in activationfuncs:
-                            #construct name
-                            NAME = "{}-conv-{}-nodes-{}-dense-{}-kernelsize-{}-activation-{}".format(convlayer, layersize, denselayer, kernelsize, activationfunc, int(time()))
+                            #construct name (format is value and then name of value)
+                            NAME = "{}-conv-{}-nodes-{}-dense-{}-kernelsize-{}-activation-{}-dropoutrate-{}-learningrate-timestamp-{}".format(convlayer, layersize, denselayer, kernelsize, activationfunc, dropoutrate, learningrate, int(time()))
+                            print(NAME)
                             #the list of callbacks to be used when fitting the model
                             cbs = []
                             if earlystop:
@@ -133,9 +141,9 @@ for convlayer in convlayers:
 
 
 
-                            os.chdir('C:/Users/rajes/OneDrive/Documents/ELEC498renew/ELEC-498-Capstone/data/models')
-                            os.mkdir('C:/Users/rajes/OneDrive/Documents/ELEC498renew/ELEC-498-Capstone/data/models/' + NAME)
-                            os.chdir('C:/Users/rajes/OneDrive/Documents/ELEC498renew/ELEC-498-Capstone/data/models/' + NAME)
+                            os.chdir('F:/ELEC498modelsdense/')
+                            os.mkdir('F:/ELEC498modelsdense/' + NAME)
+                            os.chdir('F:/ELEC498modelsdense/' + NAME)
                             #save the model
                             if simplesavemodel:
                                 model.save(NAME + ".h5")
@@ -143,6 +151,13 @@ for convlayer in convlayers:
                             if savehistory:
                                 with open(NAME + '.pkl', 'wb') as histfile:
                                     pickle.dump(history.history, histfile)
+
+                            #frees up GPU memory so that multiple models can be run in succession
+                            del model
+                            del history
+                            gc.collect()
+                            backend.clear_session()
+                            tf.reset_default_graph()
 
 #end of iteration                                
 ##############################################################################################################################
