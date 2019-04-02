@@ -6,7 +6,7 @@ import numpy as np
 from numpy import array, hstack, vstack
 
 
-
+#set working directory
 os.chdir('C:/Users/rajes/OneDrive/Documents/ELEC498renew/ELEC-498-Capstone/data')
 
 #set up all values so they can be altered easily
@@ -15,17 +15,16 @@ months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'Augus
 currmonth = 0
 day = 1
 hour = 0
+#initialize filename
 filename = str(year) + '-' + str(months[currmonth]) + '-' + str(day) + '-' + str(hour)
          
 
-
+#read in the h5 file
 f = h5py.File('thiccBOI.hdf5', 'r')
 #example access of h5 file
 #list(f['2008']['April']['1']['0']['2008-April-1-0'])
 
 yvals = {}
-
-
 #keys for the dictionary go year, month, day
 for i in range(2008,2018):
     yvals[str(i)] = {}
@@ -39,6 +38,7 @@ for i in range(1,28):
 
 flag = 0
 
+#read in the y values (rainfall vals)
 with open ('Master_numpy_withnoNulls_FIXED.csv', 'r') as csvfile:
     reader = csv.reader(csvfile)
     
@@ -86,7 +86,7 @@ for year in range(2008, 2017):
                         try:
                             temprow = list(f[str(year)][months[currmonth]][str(day)][str(hour) + '-' + str(compass)][filename][i])
                         except:
-                            #if the hour cannot be found then break
+                            #if the hour cannot be found then break (skip this record)
                             print("hour " + str(hour) + " for " + filename +  " not found, skipping")
                             break
                         #iterate over columns
@@ -100,7 +100,7 @@ for year in range(2008, 2017):
                 finalx.append(temp)
 
 
-#remove all the null values from the lists
+#remove all the null values from the lists (all skipped records)
 for i in reversed(range(len(finaly))):
     if finaly[i] == 'N':
         del finaly[i]
