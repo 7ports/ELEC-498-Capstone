@@ -72,16 +72,23 @@ train_y, test_y = g[:train_amount,:], g[train_amount:, :]
 
 #number of convolution layers in each run
 convlayers = [2]
+#number of dense layers in each run
 denselayers =[3]
+#size of the dense layers (number of nodes)
 layersizes = [2048]
+#size of x where the kernel is (1,x,x)
 kernelsizes = [3]
+#number of epochs for training
 numepochs = 40
+#dropout rate of dropout layers
 dropoutrates = [0.1]
-activationfuncs = ['elu']
+#activation function to be used by dense layers (conv layers always relu, output always softmax)
+activationfuncs = ['elu', 'sigmoid', 'tanh']
+#initial learning rate
 learningrates = [0.01]
 #whether or not to simply save final model in an h5 file
 simplesavemodel = True
-#whehter or not to stop early if stagnated
+#whether or not to stop early if stagnated
 earlystop = False
 #whether or not to reduce learning rate after plateauing
 plateau = True
