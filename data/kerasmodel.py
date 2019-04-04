@@ -73,7 +73,7 @@ train_y, test_y = g[:train_amount,:], g[train_amount:, :]
 #number of convolution layers in each run
 convlayers = [2]
 #number of dense layers in each run
-denselayers =[3]
+denselayers = [3]
 #size of the dense layers (number of nodes)
 layersizes = [2048]
 #size of x where the kernel is (1,x,x)
@@ -148,11 +148,12 @@ for convlayer in convlayers:
 
 
 
-                            os.chdir('F:/ELEC498modelsdense/')
-                            os.mkdir('F:/ELEC498modelsdense/' + NAME)
-                            os.chdir('F:/ELEC498modelsdense/' + NAME)
+
                             #save the model
                             if simplesavemodel:
+                                os.chdir('F:/ELEC498modelsdense/')
+                                os.mkdir('F:/ELEC498modelsdense/' + NAME)
+                                os.chdir('F:/ELEC498modelsdense/' + NAME)
                                 model.save(NAME + ".h5")
                             #save the training history endcoded as pickle file
                             if savehistory:
